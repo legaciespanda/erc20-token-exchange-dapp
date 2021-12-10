@@ -104,7 +104,7 @@ function Header (){
 				navigate('/exchange');
 			}
 			
-			//save to local storage
+			//save value to local storage
 			ls.set('connected', true);
 		  } catch(e) {
 			console.log("Could not get a wallet connection", e);
