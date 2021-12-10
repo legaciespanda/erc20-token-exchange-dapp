@@ -25,9 +25,21 @@ import Fortmatic from "fortmatic";
 import Portis from "@portis/web3";
 import Torus from "@toruslabs/torus-embed";
 
+import ls from 'local-storage';
+
 
 function Header (){
 
+  const navigate = useNavigate();
+
+  const [provider, setProvider] = useState('');
+  //const [web3Modal, setweb3Modal] = useState('');
+  let web3Modal;
+  const [connected, setConnected] = useState(ls.get('connected'));
+  
+  
+  
+  
   
   //initializing web3
    function initWeb3Modal() {
@@ -74,46 +86,48 @@ function Header (){
 		  providerOptions // required
 		});
 		
+		
+		
 	   const web3 = new Web3(provider);
-	
-  }
-  
+	   
+ }
+ 
+ 
   
 	async function  connectWallet() {
 		
 		  console.log("Opening a dialog");
 		  try {
-			provider = await web3Modal.connect();
+			setProvider(await web3Modal.connect());
+			//redirect to exchange page when user has connected to a wallet
+			if(isConnected){
+				navigate('/exchange');
+			}
+			
+			//save to local storage
+			ls.set('connected', true);
 		  } catch(e) {
 			console.log("Could not get a wallet connection", e);
 			return;
 	   }
+	   
 	}
 	
-	async function disconnectWallet(){
-		  //console.log("Killing the wallet connection", provider);
-
-		  // TODO: Which providers have close method?
-		  /**if(provider.close) {
-			await provider.close();
-
-			// If the cached provider is not cleared,
-			// WalletConnect will default to the existing session
-			// and does not allow to re-scan the QR code with a new wallet.
-			// Depending on your use case you may want or want not his behavir.
-			await web3Modal.clearCachedProvider();
-			provider = null;
-		  }*/
-		  //const web3Modal2 = new Web3Modal({ cacheProvider: false });
-			await web3Modal.clearCachedProvider();
-			provider = null;
-		  
-	}
-	
-		//function to check if user wallet is connected to any active network
+    //function to check if user wallet is connected to any active network
 	function isConnected(){
 		return web3Modal.connect();
 	}
+	
+	useEffect(() => {
+		  
+		initWeb3Modal();
+		
+		if(connected){
+			navigate('/exchange');
+		}	
+		
+		
+	  },[]);
 	
 	return (
 	      
@@ -133,7 +147,7 @@ function Header (){
 				  
 		  
 				
-				<CButton onClick={() => null }>Connect Your Wallet</CButton>
+				<CButton onClick={() => connectWallet() }>Connect Your Wallet</CButton>
 				 
 		  </header> 
 
